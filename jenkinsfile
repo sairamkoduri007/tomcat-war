@@ -1,0 +1,50 @@
+pipeline {
+    agent {label 'slave'}
+    stages {
+        stage("code quality"){
+            agent { docker 'maven:3-alpine' } 
+            	steps {
+               		sh '''
+                    echo code quality step
+                    '''
+            }
+        }
+        stage('code build and publish') {
+         	agent { docker 'maven:3-alpine' } 
+            	steps {
+               		sh 'mvn clean package'
+    rtUpload (
+    serverId: 'artifactory',
+    spec: '''{
+          "files": [
+            {
+              "pattern": "**/SimpleTomcatWebApp.war",
+              "target": "project/"
+            }
+         ]
+    }''',
+    buildName: 'project',
+    buildNumber: '1'
+)
+            }
+        }
+        
+                    stage('deployment') {
+                        agent {label 'slave'}
+            steps {
+            sh'''
+            pwd
+            ls
+            echo "files inside target"
+            ls target/
+            #cp SimpleTomcatWebApp.war /Library/Tomcat/webapps
+            curl -uadmin:AP2NLHDGC9Wgss6hzjDbt54MoXk -O "http://3.91.16.244:8081/artifactory/project/SimpleTomcatWebApp.war"
+            echo "webapps items"
+            ls /opt/tomcat/webapps
+            cp target/SimpleTomcatWebApp.war /opt/tomcat/webapps/SimpleTomcatWebApp.war
+            '''
+                }
+            }
+          
+    }
+}
