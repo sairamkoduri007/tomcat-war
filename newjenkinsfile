@@ -28,23 +28,16 @@ pipeline {
 )
             }
         }
-        
                     stage('deployment') {
                         agent {label 'slave'}
             steps {
             sh'''
-            pwd
-            ls
-            echo "files inside target"
-            ls target/
-            #cp SimpleTomcatWebApp.war /Library/Tomcat/webapps
-            curl -uadmin:AP2NLHDGC9Wgss6hzjDbt54MoXk -O "http://3.91.16.244:8081/artifactory/project/SimpleTomcatWebApp.war"
-            echo "webapps items"
-            ls /opt/tomcat/webapps
-            cp target/SimpleTomcatWebApp.war /opt/tomcat/webapps/SimpleTomcatWebApp.war
+            cd /home/ubuntu/
+            ls -lrt
+            curl -uadmin:AP2NLHDGC9Wgss6hzjDbt54MoXk -O "http://184.73.115.116:8081/artifactory/project/SimpleTomcatWebApp.war"
+            sudo cp SimpleTomcatWebApp.war /opt/tomcat/webapps/
             '''
                 }
             }
-          
     }
 }
